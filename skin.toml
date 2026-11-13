@@ -6,6 +6,111 @@ name = "Popamp D11"
 author = "Christian Ruesch (vector port by Popamp)"
 format_version = 1
 
+[colors.Graphite]
+tone-94 = "#141a1c"
+tone-145 = "#20272a"
+tone-235 = "#383e40"
+tone-247 = "#3b4143"
+tone-259 = "#3d4447"
+tone-302 = "#484f52"
+tone-318 = "#4c5356"
+tone-333 = "#50575a"
+tone-357 = "#565d60"
+tone-365 = "#585f62"
+tone-373 = "#5a6164"
+tone-380 = "#5c6366"
+tone-388 = "#5e6568"
+tone-396 = "#60676a"
+tone-404 = "#62696c"
+tone-412 = "#646b6e"
+tone-420 = "#666d70"
+tone-427 = "#686f72"
+tone-435 = "#6a7174"
+tone-443 = "#6c7376"
+tone-451 = "#6e7578"
+tone-459 = "#70777a"
+tone-573 = "#8e9396"
+tone-584 = "#90979a"
+tone-610 = "#979da0"
+tone-635 = "#9ea3a6"
+tone-653 = "#a4a7a9"
+tone-667 = "#a6abae"
+tone-692 = "#acb3b5"
+tone-724 = "#b4babd"
+tone-816 = "#cbd2d5"
+tone-857 = "#d6dcdf"
+tone-898 = "#e0e7ea"
+
+[colors.Ocean]
+tone-94 = "#0d1923"
+tone-145 = "#152635"
+tone-235 = "#263d52"
+tone-247 = "#284156"
+tone-259 = "#29445b"
+tone-302 = "#314f69"
+tone-318 = "#34536e"
+tone-333 = "#375774"
+tone-357 = "#3b5d7b"
+tone-365 = "#3c5f7e"
+tone-373 = "#3e6180"
+tone-380 = "#3f6383"
+tone-388 = "#406586"
+tone-396 = "#426788"
+tone-404 = "#43698b"
+tone-412 = "#446b8e"
+tone-420 = "#466d90"
+tone-427 = "#477093"
+tone-435 = "#497295"
+tone-443 = "#4a7498"
+tone-451 = "#4b769b"
+tone-459 = "#4d789d"
+tone-573 = "#6d94b7"
+tone-584 = "#7097ba"
+tone-610 = "#799ebe"
+tone-635 = "#82a4c2"
+tone-653 = "#89a8c4"
+tone-667 = "#8dacc7"
+tone-692 = "#94b2cd"
+tone-724 = "#9fbad2"
+tone-816 = "#bdd1e3"
+tone-857 = "#cbdcea"
+tone-898 = "#d8e6f2"
+
+[colors.Cocoa]
+tone-94 = "#21160f"
+tone-145 = "#312319"
+tone-235 = "#4c392c"
+tone-247 = "#503c2e"
+tone-259 = "#543e30"
+tone-302 = "#614939"
+tone-318 = "#664d3c"
+tone-333 = "#6b513f"
+tone-357 = "#725644"
+tone-365 = "#755845"
+tone-373 = "#775a47"
+tone-380 = "#795c49"
+tone-388 = "#7c5e4a"
+tone-396 = "#7e604c"
+tone-404 = "#81624d"
+tone-412 = "#83644f"
+tone-420 = "#856651"
+tone-427 = "#886852"
+tone-435 = "#8a6a54"
+tone-443 = "#8d6b55"
+tone-451 = "#8f6d57"
+tone-459 = "#916f59"
+tone-573 = "#ac8d78"
+tone-584 = "#af907b"
+tone-610 = "#b49783"
+tone-635 = "#b99d8b"
+tone-653 = "#bba292"
+tone-667 = "#bfa695"
+tone-692 = "#c5ac9c"
+tone-724 = "#cbb5a6"
+tone-816 = "#decdc2"
+tone-857 = "#e6d8cf"
+tone-898 = "#efe3db"
+
 [sheets]
 main = "sheets/main.svg"
 cbuttons = "sheets/cbuttons.svg"
@@ -23,14 +128,232 @@ eq_ex = "sheets/eq_ex.svg"
 pledit = "sheets/pledit.svg"
 
 [playlist]
-normal = "#70777a"
-current = "#e0e7ea"
-normal_bg = "#20272a"
-selected_bg = "#50575a"
+normal = "tone-459"
+current = "tone-898"
+normal_bg = "tone-145"
+selected_bg = "tone-333"
 
 [vis]
 colors = [
-    "#20272a", "#50575a", "#70777a", "#6e7578", "#6c7376", "#6a7174", "#686f72", "#666d70",
-    "#646b6e", "#62696c", "#60676a", "#5e6568", "#5c6366", "#5a6164", "#585f62", "#565d60",
-    "#20272a", "#50575a", "#e0e7ea", "#70777a", "#e0e7ea", "#e0e7ea", "#e0e7ea", "#e0e7ea",
+    "tone-145", "tone-333", "tone-459", "tone-451", "tone-443", "tone-435", "tone-427", "tone-420",
+    "tone-412", "tone-404", "tone-396", "tone-388", "tone-380", "tone-373", "tone-365", "tone-357",
+    "tone-145", "tone-333", "tone-898", "tone-459", "tone-898", "tone-898", "tone-898", "tone-898",
 ]
+
+# --- the main window's bar view, from the sheets above ---
+
+[[window]]
+key = "main"
+
+[window.bar]
+edge = "bottom"
+size = [640, 20]
+
+[[window.bar.element]]
+type = "image"
+rect = [0, 0, 316, 20]
+normal = "bar/left.svg"
+
+[[window.bar.element]]
+type = "image"
+edges = [316, 0, "end-222", 20]
+normal = "bar/mid.svg"
+fill = "tile"
+
+[[window.bar.element]]
+type = "image"
+edges = ["end-222", 0, "end", 20]
+normal = "bar/right.svg"
+
+[[window.bar.element]]
+type = "button"
+rect = [4, 5, 9, 9]
+normal = { file = "sheets/titlebar.svg", area = [0, 0, 9, 9] }
+pressed = { file = "sheets/titlebar.svg", area = [0, 9, 9, 9] }
+menu_press = "main"
+cursor = "mainmenu"
+tip = "Main Menu"
+
+[[window.bar.element]]
+type = "button"
+rect = [16, 1, 23, 18]
+normal = { file = "sheets/cbuttons.svg", area = [0, 0, 23, 18] }
+pressed = { file = "sheets/cbuttons.svg", area = [0, 18, 23, 18] }
+click = "previous"
+shift = "back5s"
+ctrl = "start-of-list"
+menu = "previous"
+tip = "Previous"
+
+[[window.bar.element]]
+type = "button"
+rect = [39, 1, 23, 18]
+normal = { file = "sheets/cbuttons.svg", area = [23, 0, 23, 18] }
+pressed = { file = "sheets/cbuttons.svg", area = [23, 18, 23, 18] }
+click = "play"
+shift = "open-file"
+ctrl = "open-url"
+menu = "play"
+tip = "Play"
+
+[[window.bar.element]]
+type = "button"
+rect = [62, 1, 23, 18]
+normal = { file = "sheets/cbuttons.svg", area = [46, 0, 23, 18] }
+pressed = { file = "sheets/cbuttons.svg", area = [46, 18, 23, 18] }
+click = "pause"
+menu = "pause"
+tip = "Pause"
+
+[[window.bar.element]]
+type = "button"
+rect = [85, 1, 23, 18]
+normal = { file = "sheets/cbuttons.svg", area = [69, 0, 23, 18] }
+pressed = { file = "sheets/cbuttons.svg", area = [69, 18, 23, 18] }
+click = "stop"
+shift = "stop-fadeout"
+ctrl = "stop-after-current"
+menu = "stop"
+tip = "Stop"
+
+[[window.bar.element]]
+type = "button"
+rect = [108, 1, 22, 18]
+normal = { file = "sheets/cbuttons.svg", area = [92, 0, 22, 18] }
+pressed = { file = "sheets/cbuttons.svg", area = [92, 18, 22, 18] }
+click = "next"
+shift = "fwd5s"
+ctrl = "end-of-list"
+menu = "next"
+tip = "Next"
+
+[[window.bar.element]]
+type = "button"
+rect = [134, 2, 22, 16]
+normal = { file = "sheets/cbuttons.svg", area = [114, 0, 22, 16] }
+pressed = { file = "sheets/cbuttons.svg", area = [114, 16, 22, 16] }
+click = "open-file"
+shift = "open-folder"
+ctrl = "open-url"
+menu = "eject"
+tip = "Open"
+
+[[window.bar.element]]
+type = "image"
+rect = [164, 6, 9, 9]
+normal = { file = "sheets/playpaus.svg", area = [0, 0, 9, 9] }
+show = "playing"
+
+[[window.bar.element]]
+type = "image"
+rect = [164, 6, 9, 9]
+normal = { file = "sheets/playpaus.svg", area = [9, 0, 9, 9] }
+show = "paused"
+
+[[window.bar.element]]
+type = "image"
+rect = [164, 6, 9, 9]
+normal = { file = "sheets/playpaus.svg", area = [18, 0, 9, 9] }
+show = "stopped"
+
+[[window.bar.element]]
+type = "clock"
+rect = [174, 4, 63, 13]
+hide = "stopped"
+
+[[window.bar.element]]
+type = "button"
+rect = [174, 4, 63, 13]
+press = "toggle-time-mode"
+menu = "time"
+
+[[window.bar.element]]
+type = "vis"
+rect = [239, 2, 76, 16]
+
+[[window.bar.element]]
+type = "button"
+rect = [239, 2, 76, 16]
+press = "cycle-vis-mode"
+menu = "vis"
+
+[[window.bar.element]]
+type = "marquee"
+edges = [319, 3, "end-225", 9]
+double = "file-info"
+cursor = "songname"
+tip = "Song Title (right-click for options)"
+menu = "song-title"
+
+[[window.bar.element]]
+type = "slider"
+edges = [317, 10, "end-223", 18]
+value = "position"
+thumb = { normal = { file = "sheets/posbar.svg", area = [248, 1, 29, 8] }, pressed = { file = "sheets/posbar.svg", area = [278, 1, 29, 8] } }
+thumb_len = 29
+live = false
+show = "seekable"
+cursor = "posbar"
+menu = "seek"
+
+[[window.bar.element]]
+type = "slider"
+edges = ["end-213", 4, "end-145", 17]
+value = "volume"
+track = { file = "sheets/volume.svg", first = [0, 0, 68, 13], step = [0, 15], count = 28 }
+thumb = { normal = { file = "sheets/volume.svg", area = [15, 422, 14, 11] }, pressed = { file = "sheets/volume.svg", area = [0, 422, 14, 11] } }
+thumb_len = 14
+reset = 200
+wheel_step = 8
+cursor = "volbal"
+tip = "Volume"
+
+[[window.bar.element]]
+type = "toggle"
+edges = ["end-141", 4, "end-118", 16]
+normal = { file = "sheets/shufrep.svg", area = [0, 61, 23, 12] }
+pressed = { file = "sheets/shufrep.svg", area = [46, 61, 23, 12] }
+on = { file = "sheets/shufrep.svg", area = [0, 73, 23, 12] }
+on_pressed = { file = "sheets/shufrep.svg", area = [46, 73, 23, 12] }
+flag = "eq-window"
+click = "toggle-eq-window"
+
+[[window.bar.element]]
+type = "toggle"
+edges = ["end-118", 4, "end-95", 16]
+normal = { file = "sheets/shufrep.svg", area = [23, 61, 23, 12] }
+pressed = { file = "sheets/shufrep.svg", area = [69, 61, 23, 12] }
+on = { file = "sheets/shufrep.svg", area = [23, 73, 23, 12] }
+on_pressed = { file = "sheets/shufrep.svg", area = [69, 73, 23, 12] }
+flag = "playlist-window"
+click = "toggle-playlist-window"
+
+[[window.bar.element]]
+type = "toggle"
+edges = ["end-90", 3, "end-43", 18]
+normal = { file = "sheets/shufrep.svg", area = [28, 0, 47, 15] }
+pressed = { file = "sheets/shufrep.svg", area = [28, 15, 47, 15] }
+on = { file = "sheets/shufrep.svg", area = [28, 30, 47, 15] }
+on_pressed = { file = "sheets/shufrep.svg", area = [28, 45, 47, 15] }
+flag = "shuffle"
+click = "toggle-shuffle"
+menu = "shuffle"
+
+[[window.bar.element]]
+type = "toggle"
+edges = ["end-44", 3, "end-16", 18]
+normal = { file = "sheets/shufrep.svg", area = [0, 0, 28, 15] }
+pressed = { file = "sheets/shufrep.svg", area = [0, 15, 28, 15] }
+on = { file = "sheets/shufrep.svg", area = [0, 30, 28, 15] }
+on_pressed = { file = "sheets/shufrep.svg", area = [0, 45, 28, 15] }
+flag = "repeat"
+click = "toggle-repeat"
+menu = "repeat"
+
+[[window.bar.element]]
+type = "button"
+edges = ["end-12", 5, "end-3", 14]
+normal = { file = "sheets/titlebar.svg", area = [18, 0, 9, 9] }
+pressed = { file = "sheets/titlebar.svg", area = [18, 9, 9, 9] }
+click = "exit"
+tip = "Close"

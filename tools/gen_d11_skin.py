@@ -2,12 +2,16 @@
 
     python3 -I -B tools/gen_d11_skin.py OUT_DIR [--psz FILE]
 
+The main window also has a bar view, a strip across the screen put
+together from the same sheets, which the user switches to in the main menu.
+
 The theme is flat pixel art, so every area of one colour becomes one whole
 shape: a rectangle where it is one, an outline otherwise. An area is drawn
 without its holes and what lies in a hole is drawn over it, so a window
 frame with a panel in it is two rectangles, not a ring.
 """
 import argparse
+import colorsys
 import io
 import os
 import zipfile
@@ -47,8 +51,77 @@ format_version = 1
 """
 
 
+BODY, DISPLAY, LINE, COLON = "#50575a", "#20272a", "#000000", "#e0e7ea"
+BAR_H = 20
+# The bar's fixed ends, and the narrowest bar
+BAR_LEFT, BAR_RIGHT, BAR_MIN = 316, 222, 640
+
+BAR_WINDOW = """\
+
+# --- the main window's bar view, from the sheets above ---
+
+[[window]]
+key = "main"
+
+[window.bar]
+edge = "bottom"
+size = [%d, %d]
+""" % (BAR_MIN, BAR_H)
+
+
+# Colour sets. The theme is a family of blue-tinted greys with orange lamps.
+# A set keeps the lamps and gives the greys another hue: (name, hue in
+# degrees, saturation added). Blue is the orange's opposite on the colour
+# wheel, brown is its neighbour.
+FIRST_SET = "Graphite"
+OTHER_SETS = (("Ocean", 208, 0.3), ("Cocoa", 24, 0.2))
+# The greys are the colours about this hue and no more saturated than this
+GREY_HUE, GREY_SATURATION = (185, 210), 0.2
+# The greys met so far, as name by colour
+GREYS = {}
+
+
 def hexc(rgb):
     return "#%02x%02x%02x" % tuple(int(v) for v in rgb)
+
+
+def hls(colour):
+    return colorsys.rgb_to_hls(*(int(colour[i : i + 2], 16) / 255 for i in (1, 3, 5)))
+
+
+def grey_name(colour):
+    """The name a grey of the theme has in the colour sets, None for any other colour."""
+    h, l, s = hls(colour)
+    if not (GREY_HUE[0] <= h * 360 <= GREY_HUE[1] and s <= GREY_SATURATION):
+        return None
+    name = GREYS.setdefault(colour, f"tone-{round(l * 1000)}")
+    assert sum(n == name for n in GREYS.values()) == 1, f"two greys are both {name}"
+    return name
+
+
+def paint(colour, attr="fill"):
+    """The attributes that colour a shape: the colour, and its class if a colour set can change it."""
+    name = grey_name(colour)
+    suffix = "" if attr == "fill" else f"-{attr}"
+    return (f'class="{name}{suffix}" ' if name else "") + f'{attr}="{colour}"'
+
+
+def named(colour):
+    """A colour for skin.toml: its name if a colour set can change it."""
+    return grey_name(colour) or colour
+
+
+def colour_sets():
+    """The [colors] tables: the first set as the theme is, the others with the greys in their hue."""
+    greys = sorted(GREYS.items(), key=lambda g: hls(g[0])[1])
+    lines = [f"[colors.{FIRST_SET}]", *(f'{name} = "{colour}"' for colour, name in greys)]
+    for set_name, hue, saturation in OTHER_SETS:
+        lines += ["", f"[colors.{set_name}]"]
+        for colour, name in greys:
+            _, l, s = hls(colour)
+            rgb = colorsys.hls_to_rgb(hue / 360, l, min(1, s + saturation))
+            lines.append(f'{name} = "{hexc(round(v * 255) for v in rgb)}"')
+    return lines + [""]
 
 
 def read_reference(path):
@@ -162,11 +235,11 @@ def draw(img):
     for depth, colour, x, y, solid in areas(img):
         h, w = solid.shape
         if solid.all() and min(w, h) >= PANEL:
-            shapes.append((depth, f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="{hexc(colour)}"/>'))
+            shapes.append((depth, f'<rect x="{x}" y="{y}" width="{w}" height="{h}" {paint(hexc(colour))}/>'))
         else:
             paths.setdefault((depth, colour), []).append(outline(solid, x, y))
     for (depth, colour), d in paths.items():
-        shapes.append((depth, f'<path d="{"".join(d)}" fill="{hexc(colour)}"/>'))
+        shapes.append((depth, f'<path d="{"".join(d)}" {paint(hexc(colour))}/>'))
     shapes.sort(key=lambda s: s[0])
     return [s for _, s in shapes]
 
@@ -180,8 +253,8 @@ def popamp_mark(img):
     k = (h - 5) / 118.8
     bolt = " ".join(f"{cx + px * k:.2f},{cy + py * k:.2f}" for px, py in BOLT)
     return [
-        f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{colour}"/>',
-        f'<polygon points="{bolt}" fill="{colour}"/>',
+        f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" {paint(colour, "stroke")}/>',
+        f'<polygon points="{bolt}" {paint(colour)}/>',
     ]
 
 
@@ -197,17 +270,113 @@ def playlist_colours(pledit_txt):
     for line in pledit_txt.splitlines():
         key, _, value = line.partition("=")
         if key.strip().lower() in keys:
-            lines.append(f'{keys[key.strip().lower()]} = "{value.strip().lower()}"')
+            lines.append(f'{keys[key.strip().lower()]} = "{named(value.strip().lower())}"')
     return lines
 
 
 def vis_colours(viscolor_txt):
     colours = []
     for line in viscolor_txt.splitlines()[:24]:
-        colours.append(hexc(line.split("//")[0].split(",")[:3]))
+        colours.append(named(hexc(line.split("//")[0].split(",")[:3])))
     lines = ["[vis]", "colors = ["]
     lines += ["    " + ", ".join(f'"{c}"' for c in colours[i : i + 8]) + "," for i in range(0, 24, 8)]
     return lines + ["]"]
+
+
+def rects(w, h, *shapes):
+    """An SVG of rectangles given as (x, y, width, height, colour)."""
+    body = "\n".join(f'<rect x="{x}" y="{y}" width="{rw}" height="{rh}" {paint(c)}/>' for x, y, rw, rh, c in shapes)
+    return f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}">\n{body}\n</svg>\n'
+
+
+def bar_pictures():
+    """The bar's own pictures by file name: its body with the frames the classic buttons sit in."""
+    body = lambda w: [(0, 0, w, BAR_H, LINE), (0, 1, w, BAR_H - 2, BODY)]
+    return {
+        # frames of the transport buttons and of Open, then the display up to the title, with the clock's colon
+        "left": rects(BAR_LEFT, BAR_H, *body(BAR_LEFT), (15, 0, 116, 20, LINE), (133, 1, 24, 18, LINE),
+                      (160, 1, 156, 18, LINE), (161, 2, 155, 16, DISPLAY), (211, 9, 2, 2, COLON), (211, 13, 2, 2, COLON)),  # fmt: skip
+        # the display under the title, with the groove of the position slider
+        "mid": rects(8, BAR_H, (0, 0, 8, BAR_H, LINE), (0, 2, 8, 16, DISPLAY), (0, 13, 8, 2, LINE)),
+        # the display's end, then frames of the EQ and PL lamps and of Shuffle and Repeat
+        "right": rects(BAR_RIGHT, BAR_H, *body(BAR_RIGHT), (0, 1, 1, 18, LINE), (80, 3, 48, 14, LINE), (131, 2, 76, 17, LINE)),
+    }
+
+
+def element(kind, place, **keys):
+    """One element of a bar view as TOML; a place with a text in it is `edges`."""
+    where = "edges" if any(isinstance(v, str) for v in place) else "rect"
+    lines = ["", "[[window.bar.element]]", f'type = "{kind}"', f"{where} = {toml(list(place))}"]
+    return lines + [f"{k} = {toml(v)}" for k, v in keys.items()]
+
+
+def toml(v):
+    if isinstance(v, bool):
+        return "true" if v else "false"
+    if isinstance(v, dict):
+        return "{ " + ", ".join(f"{k} = {toml(x)}" for k, x in v.items()) + " }"
+    if isinstance(v, list):
+        return "[" + ", ".join(toml(x) for x in v) + "]"
+    return f'"{v}"' if isinstance(v, str) else str(v)
+
+
+def area(sheet, x, y, w, h):
+    return {"file": f"sheets/{sheet}.svg", "area": [x, y, w, h]}
+
+
+def end(x):
+    """A place counted from the bar's right end, where the right picture starts at 0."""
+    return f"end-{BAR_RIGHT - x}"
+
+
+def bar_window():
+    """The bar as TOML: the classic sprites on the bar's own body."""
+    e = []
+    e += element("image", (0, 0, BAR_LEFT, BAR_H), normal="bar/left.svg")
+    e += element("image", (BAR_LEFT, 0, end(0), BAR_H), normal="bar/mid.svg", fill="tile")
+    e += element("image", (end(0), 0, "end", BAR_H), normal="bar/right.svg")
+    e += element("button", (4, 5, 9, 9), normal=area("titlebar", 0, 0, 9, 9), pressed=area("titlebar", 0, 9, 9, 9),
+                 menu_press="main", cursor="mainmenu", tip="Main Menu")  # fmt: skip
+    transport = (
+        (16, 0, 23, "previous", "Previous", {"shift": "back5s", "ctrl": "start-of-list", "menu": "previous"}),
+        (39, 23, 23, "play", "Play", {"shift": "open-file", "ctrl": "open-url", "menu": "play"}),
+        (62, 46, 23, "pause", "Pause", {"menu": "pause"}),
+        (85, 69, 23, "stop", "Stop", {"shift": "stop-fadeout", "ctrl": "stop-after-current", "menu": "stop"}),
+        (108, 92, 22, "next", "Next", {"shift": "fwd5s", "ctrl": "end-of-list", "menu": "next"}),
+    )
+    for x, sx, w, click, tip, more in transport:
+        e += element("button", (x, 1, w, 18), normal=area("cbuttons", sx, 0, w, 18), pressed=area("cbuttons", sx, 18, w, 18),
+                     click=click, **more, tip=tip)  # fmt: skip
+    e += element("button", (134, 2, 22, 16), normal=area("cbuttons", 114, 0, 22, 16), pressed=area("cbuttons", 114, 16, 22, 16),
+                 click="open-file", shift="open-folder", ctrl="open-url", menu="eject", tip="Open")  # fmt: skip
+    for sx, state in ((0, "playing"), (9, "paused"), (18, "stopped")):
+        e += element("image", (164, 6, 9, 9), normal=area("playpaus", sx, 0, 9, 9), show=state)
+    e += element("clock", (174, 4, 63, 13), hide="stopped")
+    e += element("button", (174, 4, 63, 13), press="toggle-time-mode", menu="time")
+    e += element("vis", (239, 2, 76, 16))
+    e += element("button", (239, 2, 76, 16), press="cycle-vis-mode", menu="vis")
+    e += element("marquee", (BAR_LEFT + 3, 3, end(-3), 9), double="file-info", cursor="songname",
+                 tip="Song Title (right-click for options)", menu="song-title")  # fmt: skip
+    # the position thumb without its top and bottom lines, to fit under the title
+    thumb = {"normal": area("posbar", 248, 1, 29, 8), "pressed": area("posbar", 278, 1, 29, 8)}
+    e += element("slider", (BAR_LEFT + 1, 10, end(-1), 18), value="position", thumb=thumb, thumb_len=29, live=False,
+                 show="seekable", cursor="posbar", menu="seek")  # fmt: skip
+    track = {"file": "sheets/volume.svg", "first": [0, 0, 68, 13], "step": [0, 15], "count": 28}
+    thumb = {"normal": area("volume", 15, 422, 14, 11), "pressed": area("volume", 0, 422, 14, 11)}
+    e += element("slider", (end(9), 4, end(77), 17), value="volume", track=track, thumb=thumb, thumb_len=14, reset=200,
+                 wheel_step=8, cursor="volbal", tip="Volume")  # fmt: skip
+    toggles = (
+        ("shufrep", 81, 4, 23, 12, (0, 61), (46, 61), (0, 73), (46, 73), "eq-window", "toggle-eq-window", {}),
+        ("shufrep", 104, 4, 23, 12, (23, 61), (69, 61), (23, 73), (69, 73), "playlist-window", "toggle-playlist-window", {}),
+        ("shufrep", 132, 3, 47, 15, (28, 0), (28, 15), (28, 30), (28, 45), "shuffle", "toggle-shuffle", {"menu": "shuffle"}),
+        ("shufrep", 178, 3, 28, 15, (0, 0), (0, 15), (0, 30), (0, 45), "repeat", "toggle-repeat", {"menu": "repeat"}),
+    )
+    for sheet, x, y, w, h, off, off_down, on, on_down, flag, click, more in toggles:
+        e += element("toggle", (end(x), y, end(x + w), y + h), normal=area(sheet, *off, w, h), pressed=area(sheet, *off_down, w, h),
+                     on=area(sheet, *on, w, h), on_pressed=area(sheet, *on_down, w, h), flag=flag, click=click, **more)  # fmt: skip
+    e += element("button", (end(210), 5, end(219), 14), normal=area("titlebar", 18, 0, 9, 9), pressed=area("titlebar", 18, 9, 9, 9),
+                 click="exit", tip="Close")  # fmt: skip
+    return [BAR_WINDOW.rstrip("\n"), *e]
 
 
 def build(out):
@@ -222,6 +391,13 @@ def build(out):
     lines = [META, "[sheets]"]
     lines += [f'{name} = "sheets/{name}.svg"' for name in SHEETS]
     lines += ["", *playlist_colours(ref["pledit.txt"]), "", *vis_colours(ref["viscolor.txt"])]
+    os.makedirs(os.path.join(out, "bar"), exist_ok=True)
+    for name, picture in bar_pictures().items():
+        with open(os.path.join(out, "bar", f"{name}.svg"), "w") as f:
+            f.write(picture)
+    lines += bar_window()
+    # after everything that draws, so every grey in use is in the sets
+    lines[1:1] = colour_sets()
     with open(os.path.join(out, "skin.toml"), "w") as f:
         f.write("\n".join(lines) + "\n")
 
@@ -231,8 +407,9 @@ def pack(out, psz):
     with zipfile.ZipFile(psz, "w", zipfile.ZIP_DEFLATED) as z:
         for name in ("skin.toml", "README.md", "LICENSE-CC0", "LICENSE-APACHE", "LICENSE-MIT"):
             z.write(os.path.join(out, name), name)
-        for name in sorted(os.listdir(os.path.join(out, "sheets"))):
-            z.write(os.path.join(out, "sheets", name), f"sheets/{name}")
+        for folder in ("sheets", "bar"):
+            for name in sorted(os.listdir(os.path.join(out, folder))):
+                z.write(os.path.join(out, folder, name), f"{folder}/{name}")
 
 
 def main():

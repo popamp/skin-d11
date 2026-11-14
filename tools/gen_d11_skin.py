@@ -70,6 +70,7 @@ META = """\
 name = "Popamp D11"
 author = "Christian Ruesch (vector port by Popamp)"
 format_version = 1
+min_popamp = "1.0.0"
 """
 
 

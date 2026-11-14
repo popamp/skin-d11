@@ -9,7 +9,7 @@ files are more complicated than the skin needs. Fork it and redraw it.
 
 Flat dark grey, a slate display and orange lamps: the default theme of the d11amp player, drawn by Christian Ruesch, as vector sheets, with d11amp's mark replaced by Popamp's bolt.
 
-![Popamp D11: main window, equalizer and playlist](preview.png)
+![Popamp D11: main window, equalizer and playlist in every colour set, and the bar below](preview.png)
 
 A vector skin for [Popamp](https://github.com/popamp/popamp), skin format
 version 1. It is only a port of an existing design; see

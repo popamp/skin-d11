@@ -95,6 +95,31 @@ size = [%d, %d]
 """ % (BAR_MIN, BAR_H)
 
 
+# The media library: the playlist's frame from its sheet, as in the classic
+# layout, with a title of its own on the title bar. Its letters are the
+# theme's title font, 3 by 7 pixels with soft corners (`e`), a pixel apart:
+# M from MAIN, E and R from EQUALIZER, I, A, L and Y from PLAYLIST. The
+# theme has no D or B; D has the round side of P, B the top of R and the
+# bottom of D.
+TITLE_FONT = {
+    "M": ("D.D", "DDD", "DeD", "D.D", "D.D", "D.D", "D.D"),
+    "E": ("eDD", "D..", "D..", "DD.", "D..", "D..", "eDD"),
+    "D": ("DDe", "D.D", "D.D", "D.D", "D.D", "D.D", "DDe"),
+    "I": ("DDD", ".D.", ".D.", ".D.", ".D.", ".D.", "DDD"),
+    "A": ("eDe", "D.D", "D.D", "DDD", "D.D", "D.D", "D.D"),
+    "L": ("D..", "D..", "D..", "D..", "D..", "D..", "eDD"),
+    "B": ("DDe", "D.D", "D.D", "DDe", "D.D", "D.D", "DDe"),
+    "R": ("DDe", "D.D", "D.D", "DDe", "D.D", "D.D", "D.D"),
+    "Y": ("D.D", "D.D", "D.D", "eDD", "..D", "..D", "DDe"),
+    " ": ("...",) * 7,
+}  # fmt: skip
+# Where the playlist's title shows the plate (`.`), a letter and a soft
+# corner (`e`); the new title takes its colours from there
+TITLE_INK = {".": (60, 4), "D": (61, 4), "e": (63, 4)}
+# The plate starts 3 pixels down the title bar, and the letters 1 pixel and
+# 3 pixels into it, as PLAYLIST does
+TITLE_TOP, TITLE_PAD = 3, 3
+
 # Colour sets. The theme is a family of blue-tinted greys with orange lamps.
 # A set keeps the lamps and gives the greys another hue: (name, hue in
 # degrees, saturation added). Blue is the orange's opposite on the colour
@@ -411,10 +436,10 @@ def bar_buttons():
     return picture.replace("\n</svg>", "\n" + "\n".join(glyphs) + "\n</svg>")
 
 
-def element(kind, place, **keys):
-    """One element of a bar view as TOML; a place with a text in it is `edges`."""
+def element(kind, place, view="bar", **keys):
+    """One element of a window's view as TOML; a place with a text in it is `edges`."""
     where = "edges" if any(isinstance(v, str) for v in place) else "rect"
-    lines = ["", "[[window.bar.element]]", f'type = "{kind}"', f"{where} = {toml(list(place))}"]
+    lines = ["", f"[[window.{view}.element]]", f'type = "{kind}"', f"{where} = {toml(list(place))}"]
     return lines + [f"{k} = {toml(v)}" for k, v in keys.items()]
 
 
@@ -496,6 +521,55 @@ def bar_window():
     return [BAR_WINDOW.rstrip("\n"), *e]
 
 
+def title_picture(pledit, text):
+    """A window's title in the theme's title font, on its plate, in the playlist title's colours."""
+    ink = {k: pledit[y, x] for k, (x, y) in TITLE_INK.items()}
+    w = len(text) * 4 - 1 + 2 * TITLE_PAD
+    img = np.zeros((9, w, 3), dtype=np.uint8)
+    img[:, :] = ink["."]
+    for i, letter in enumerate(text):
+        for y, row in enumerate(TITLE_FONT[letter]):
+            for x, k in enumerate(row):
+                img[1 + y, TITLE_PAD + 4 * i + x] = ink[k]
+    return img
+
+
+def library_window(title_width):
+    """The media library as TOML: the classic library in the playlist's frame, with its own title."""
+    pl = lambda x, y, w, h: area("pledit", x, y, w, h)
+    # the title bar's parts, as the window has focus and as it has not
+    focus = lambda x: {"normal": pl(x, 0, 25, 20), "inactive": pl(x, 21, 25, 20)}
+    v = "normal"
+    e = ["", "# --- the media library, in the playlist's frame from the sheets above ---", "", "[[window]]", 'key = "library"',
+         'placement = "docked"', 'empty_press = "nothing"', "wheel_scrolls_list = true", "", "[window.normal]",
+         "size = [275, 116]", "resize_step = [25, 29]", 'cursor = "pnormal"']  # fmt: skip
+    e += element("image", (0, 0, 25, 20), v, **focus(0))
+    e += element("image", (25, 0, "end-25", 20), v, **focus(127), fill="tile")
+    e += element("image", ("end-25", 0, "end", 20), v, **focus(153))
+    half = title_width // 2
+    e += element("image", (f"center-{half}", TITLE_TOP, f"center+{title_width - half}", TITLE_TOP + 9), v, normal="ml/title.svg")
+    e += element("image", (0, 20, 12, "end-38"), v, normal=pl(0, 42, 12, 29), fill="tile")
+    e += element("image", ("end-20", 20, "end", "end-38"), v, normal=pl(31, 42, 20, 29), fill="tile")
+    e += element("image", (12, "end-38", "end-150", "end"), v, normal=pl(179, 0, 25, 38), fill="tile")
+    # the bottom's left end without the ADD, REM, SEL and MISC buttons
+    e += element("image", (0, "end-38", 12, "end"), v, normal=pl(0, 72, 12, 38))
+    e += element("image", ("end-150", "end-38", "end", "end"), v, normal=pl(126, 72, 150, 38))
+    e += element("drag", (0, 0, "end", 20), v, cursor="ptbar")
+    e += element("button", ("end-11", 3, "end-2", 12), v, pressed=pl(52, 42, 9, 9), click="toggle-library-window",
+                 cursor="pclose", tip="Close")  # fmt: skip
+    # over the right side's groove: each list has a bar of its own
+    thumb = {"normal": pl(52, 53, 8, 18), "pressed": pl(61, 53, 8, 18)}
+    e += element("library", (12, 20, "end-7", "end-38"), v, menu="library", thumb=thumb)
+    e += element("text", ("end-143", "end-28", "end-58", "end-22"), v, text="library-status")
+    e += element("text", ("end-82", "end-14", "end-52", "end-8"), v, text="playlist-clock", hide="stopped")
+    mini = ((6, 8, "previous"), (14, 8, "play"), (22, 9, "pause"), (31, 8, "stop"), (39, 8, "next"), (48, 9, "open-file"))
+    for x, w, click in mini:
+        e += element("button", (f"end-{150 - x}", "end-16", f"end-{150 - x - w}", "end-7"), v, click=click)
+    e += element("button", ("end-44", "end-30", "end-22", "end-12"), v, menu_release="library", tip="Library Menu")
+    e += element("resize", ("end-20", "end-20", "end", "end"), v, cursor="psize")
+    return e
+
+
 def build(out):
     ref = read_reference(REFERENCE)
     images = {name: ref[name] for name in SHEETS}
@@ -514,6 +588,11 @@ def build(out):
         with open(os.path.join(out, "bar", f"{name}.svg"), "w") as f:
             f.write(picture)
     lines += bar_window()
+    title = title_picture(images["pledit"], "MEDIA LIBRARY")
+    os.makedirs(os.path.join(out, "ml"), exist_ok=True)
+    with open(os.path.join(out, "ml", "title.svg"), "w") as f:
+        f.write(svg(title))
+    lines += library_window(title.shape[1])
     # after everything that draws, so every grey in use is in the sets
     lines[1:1] = colour_sets()
     with open(os.path.join(out, "skin.toml"), "w") as f:
@@ -523,9 +602,9 @@ def build(out):
 def pack(out, psz):
     """A .psz with what the skin needs to run and to be passed on."""
     with zipfile.ZipFile(psz, "w", zipfile.ZIP_DEFLATED) as z:
-        for name in ("skin.toml", "README.md", "LICENSE-CC0", "LICENSE-APACHE", "LICENSE-MIT"):
+        for name in ("skin.toml", "README.md", "COPYRIGHT", "LICENSE-CC0", "LICENSE-APACHE", "LICENSE-MIT"):
             z.write(os.path.join(out, name), name)
-        for folder in ("sheets", "bar"):
+        for folder in ("sheets", "bar", "ml"):
             for name in sorted(os.listdir(os.path.join(out, folder))):
                 z.write(os.path.join(out, folder, name), f"{folder}/{name}")
 

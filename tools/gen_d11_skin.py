@@ -37,6 +37,28 @@ BOLT = ((-10.43, -59.4), (23.46, -59.4), (0, -19.92), (30.91, -19.92), (-19.74, 
 # (dots, strokes of letters, rules) join their colour's path
 PANEL = 3
 
+# Icons drawn as whole shapes rather than traced: the theme shades its tiny
+# pixel art by hand, and those steps and shading dots show once it is larger.
+# Each is (sheet, its box (x, y, w, h), how far down the sheet its other
+# states are, its shapes). A shape is ("fill", polygon points), ("rect", x, y,
+# w, h), ("circle", x, y, r) or ("line", path data, width); its colour is the one in the box
+# furthest from the button's.
+ICONS = (
+    ("cbuttons", (7, 5, 9, 8), (0, 18), (("rect", 7, 5, 2, 8), ("fill", "15,5 15,13 10,9"))),  # previous
+    ("cbuttons", (30, 5, 9, 8), (0, 18), (("fill", "30,5 30,13 38,9"),)),  # play
+    ("cbuttons", (98, 5, 8, 8), (0, 18), (("fill", "98,5 98,13 103,9"), ("rect", 104, 5, 2, 8))),  # next
+    ("cbuttons", (120, 3, 10, 9), (0, 16), (("fill", "121,8 129,8 125,4"), ("rect", 121, 10, 8, 2))),  # open
+    ("titlebar", (2, 2, 5, 5), (0, 9), (("line", "M2.5 6.5L7 2M2 7L3.5 5.5", 1), ("circle", 4.5, 4.5, 1.2))),  # menu
+    ("titlebar", (11, 3, 5, 3), (0, 9), (("fill", "11,3 16,3 13.5,5.5"),)),  # minimize
+    ("titlebar", (20, 2, 5, 5), (0, 9), (("line", "M20.2 2.2L24.8 6.8M24.8 2.2L20.2 6.8", 1.3),)),  # close
+    ("playpaus", (0, 2, 5, 7), (0,), (("fill", "0,2 0,9 4.5,5.5"),)),  # playing
+    ("shufrep", (46, 2, 13, 12), (0, 15, 30, 45),
+     (("line", "M46.5 5H48.5L53.5 11H55.5M46.5 11H48.5L53.5 5H55.5", 2), ("fill", "55,2 55,8 58,5"), ("fill", "55,8 55,14 58,11"))),  # shuffle
+    ("shufrep", (9, 3, 10, 10), (0, 15, 30, 45),
+     (("line", "M9.8 8A4.2 4.2 0 0 1 16.1 4.4M18.2 8A4.2 4.2 0 0 1 11.9 11.6", 1.5),
+      ("fill", "19,3.5 19,8 14.5,8"), ("fill", "9,12.5 9,8 13.5,8"))),  # repeat
+)  # fmt: skip
+
 # Colours this close are one colour that the drawing program saved unevenly
 SAME_COLOUR = 2
 
@@ -258,6 +280,39 @@ def popamp_mark(img):
     ]
 
 
+def icon_shape(shape, ink):
+    kind, *v = shape
+    if kind == "fill":
+        return f'<polygon points="{v[0]}" {paint(ink)}/>'
+    if kind == "rect":
+        return f'<rect x="{v[0]}" y="{v[1]}" width="{v[2]}" height="{v[3]}" {paint(ink)}/>'
+    if kind == "circle":
+        return f'<circle cx="{v[0]}" cy="{v[1]}" r="{v[2]}" fill="none" {paint(ink, "stroke")}/>'
+    return f'<path d="{v[0]}" fill="none" stroke-width="{v[1]}" {paint(ink, "stroke")}/>'
+
+
+def vector_icons(images):
+    """Takes the ICONS off their sheets and returns their shapes, by sheet."""
+    shapes = {}
+    for sheet, (x, y, w, h), shifts, icon in ICONS:
+        for dy in shifts:
+            img = images[sheet]
+            box = img[y + dy : y + dy + h, x : x + w]
+            # the button's colour is the commonest one in the pixels round the box
+            top, left = max(y + dy - 1, 0), max(x - 1, 0)
+            around = np.ones(img.shape[:2], dtype=bool)
+            around[y + dy : y + dy + h, x : x + w] = False
+            ring = img[top : y + dy + h + 1, left : x + w + 1][around[top : y + dy + h + 1, left : x + w + 1]]
+            colours, n = np.unique(ring, axis=0, return_counts=True)
+            face = colours[n.argmax()].astype(int)
+            ink = hexc(max(np.unique(box.reshape(-1, 3), axis=0), key=lambda c: np.abs(c.astype(int) - face).sum()))
+            box[:] = face
+            moved = f' transform="translate(0 {dy})"' if dy else ""
+            body = "".join(icon_shape(s, ink) for s in icon)
+            shapes.setdefault(sheet, []).append(f"<g{moved}>{body}</g>")
+    return shapes
+
+
 def svg(img, extra=()):
     h, w = img.shape[:2]
     body = "\n".join([*draw(img), *extra])
@@ -362,7 +417,9 @@ def bar_window():
     e += element("slider", (BAR_LEFT + 1, 10, end(-1), 18), value="position", thumb=thumb, thumb_len=29, live=False,
                  show="seekable", cursor="posbar", menu="seek")  # fmt: skip
     track = {"file": "sheets/volume.svg", "first": [0, 0, 68, 13], "step": [0, 15], "count": 28}
-    thumb = {"normal": area("volume", 15, 422, 14, 11), "pressed": area("volume", 0, 422, 14, 11)}
+    # a pixel down, as in the classic main window, to sit on the middle of the track
+    down = {"offset": [0, 1]}
+    thumb = {"normal": area("volume", 15, 422, 14, 11) | down, "pressed": area("volume", 0, 422, 14, 11) | down}
     e += element("slider", (end(9), 4, end(77), 17), value="volume", track=track, thumb=thumb, thumb_len=14, reset=200,
                  wheel_step=8, cursor="volbal", tip="Volume")  # fmt: skip
     toggles = (
@@ -383,11 +440,12 @@ def build(out):
     ref = read_reference(REFERENCE)
     images = {name: ref[name] for name in SHEETS}
     merge_near_colours(images)
-    mark = popamp_mark(images["main"])
+    extra = vector_icons(images)
+    extra["main"] = popamp_mark(images["main"])
     os.makedirs(os.path.join(out, "sheets"), exist_ok=True)
     for name, img in images.items():
         with open(os.path.join(out, "sheets", f"{name}.svg"), "w") as f:
-            f.write(svg(img, mark if name == "main" else ()))
+            f.write(svg(img, extra.get(name, ())))
     lines = [META, "[sheets]"]
     lines += [f'{name} = "sheets/{name}.svg"' for name in SHEETS]
     lines += ["", *playlist_colours(ref["pledit.txt"]), "", *vis_colours(ref["viscolor.txt"])]

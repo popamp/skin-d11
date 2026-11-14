@@ -19,7 +19,7 @@ version 1. It is only a port of an existing design; see
 
 The main window has a second view: a bar across the screen, at its top or
 bottom edge, put together from the same pictures. Switch between the two
-in the main menu's "Main window as". This needs Popamp 1.0.0 or newer.
+in the main menu's "Toolbar mode". This needs Popamp 1.0.0 or newer.
 
 ## Colours
 

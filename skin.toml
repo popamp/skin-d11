@@ -32,13 +32,11 @@ tone-459 = "#70777a"
 tone-573 = "#8e9396"
 tone-584 = "#90979a"
 tone-610 = "#979da0"
-tone-635 = "#9ea3a6"
 tone-653 = "#a4a7a9"
 tone-667 = "#a6abae"
 tone-692 = "#acb3b5"
 tone-724 = "#b4babd"
 tone-816 = "#cbd2d5"
-tone-857 = "#d6dcdf"
 tone-898 = "#e0e7ea"
 
 [colors.Ocean]
@@ -67,13 +65,11 @@ tone-459 = "#4d789d"
 tone-573 = "#6d94b7"
 tone-584 = "#7097ba"
 tone-610 = "#799ebe"
-tone-635 = "#82a4c2"
 tone-653 = "#89a8c4"
 tone-667 = "#8dacc7"
 tone-692 = "#94b2cd"
 tone-724 = "#9fbad2"
 tone-816 = "#bdd1e3"
-tone-857 = "#cbdcea"
 tone-898 = "#d8e6f2"
 
 [colors.Cocoa]
@@ -102,13 +98,11 @@ tone-459 = "#916f59"
 tone-573 = "#ac8d78"
 tone-584 = "#af907b"
 tone-610 = "#b49783"
-tone-635 = "#b99d8b"
 tone-653 = "#bba292"
 tone-667 = "#bfa695"
 tone-692 = "#c5ac9c"
 tone-724 = "#cbb5a6"
 tone-816 = "#decdc2"
-tone-857 = "#e6d8cf"
 tone-898 = "#efe3db"
 
 [sheets]
@@ -301,7 +295,7 @@ type = "slider"
 edges = ["end-213", 4, "end-145", 17]
 value = "volume"
 track = { file = "sheets/volume.svg", first = [0, 0, 68, 13], step = [0, 15], count = 28 }
-thumb = { normal = { file = "sheets/volume.svg", area = [15, 422, 14, 11] }, pressed = { file = "sheets/volume.svg", area = [0, 422, 14, 11] } }
+thumb = { normal = { file = "sheets/volume.svg", area = [15, 422, 14, 11], offset = [0, 1] }, pressed = { file = "sheets/volume.svg", area = [0, 422, 14, 11], offset = [0, 1] } }
 thumb_len = 14
 reset = 200
 wheel_step = 8

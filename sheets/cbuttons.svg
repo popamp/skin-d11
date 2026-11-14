@@ -16,12 +16,12 @@
 <rect x="53" y="5" width="3" height="8" class="tone-898" fill="#e0e7ea"/>
 <rect x="58" y="5" width="3" height="8" class="tone-898" fill="#e0e7ea"/>
 <rect x="76" y="5" width="8" height="8" class="tone-898" fill="#e0e7ea"/>
-<path d="M124 20h2v1h1v1h1v1h1v1h-8v-1h1v-1h1v-1h1zM7 23h2v8h-2zM14 23h1v8h-1v-1h-1v-1h-1v-1h-1v-2h1v-1h1v-1h1zM30 23h1v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-1zM98 23h1v1h1v1h1v1h1v2h-1v1h-1v1h-1v1h-1zM104 23h2v8h-2zM121 26h8v2h-8z" fill="#000000"/>
-<path d="M31 23h1v1h-1zM33 24h1v1h-1zM35 25h1v1h-1zM37 26h1v2h-1zM35 28h1v1h-1zM33 29h1v1h-1zM31 30h1v1h-1z" fill="#772605"/>
-<path d="M124 19h2v1h-2zM123 20h1v1h-1zM126 20h1v1h-1zM122 21h1v1h-1zM127 21h1v1h-1zM121 22h1v1h-1zM128 22h1v1h-1zM13 23h1v1h-1zM99 23h1v1h-1zM12 24h1v1h-1zM100 24h1v1h-1zM11 25h1v1h-1zM101 25h1v1h-1zM10 26h1v2h-1zM102 26h1v2h-1zM11 28h1v1h-1zM101 28h1v1h-1zM12 29h1v1h-1zM100 29h1v1h-1zM13 30h1v1h-1zM99 30h1v1h-1z" fill="#a43809"/>
-<path d="M32 5h1v1h-1zM34 6h1v1h-1zM36 7h1v1h-1zM36 10h1v1h-1zM34 11h1v1h-1zM32 12h1v1h-1z" class="tone-653" fill="#a4a7a9"/>
-<path d="M124 3h2v1h-2zM123 4h1v1h-1zM126 4h1v1h-1zM13 5h1v1h-1zM99 5h1v1h-1zM122 5h1v1h-1zM127 5h1v1h-1zM12 6h1v1h-1zM100 6h1v1h-1zM121 6h1v1h-1zM128 6h1v1h-1zM11 7h1v1h-1zM101 7h1v1h-1zM10 8h1v2h-1zM102 8h1v2h-1zM11 10h1v1h-1zM101 10h1v1h-1zM12 11h1v1h-1zM100 11h1v1h-1zM13 12h1v1h-1zM99 12h1v1h-1z" class="tone-724" fill="#b4babd"/>
-<path d="M32 23h1v1h-1zM34 24h1v1h-1zM36 25h1v1h-1zM36 28h1v1h-1zM34 29h1v1h-1zM32 30h1v1h-1z" fill="#c5450d"/>
-<path d="M31 5h1v1h-1zM33 6h1v1h-1zM35 7h1v1h-1zM37 8h1v2h-1zM35 10h1v1h-1zM33 11h1v1h-1zM31 12h1v1h-1z" class="tone-816" fill="#cbd2d5"/>
-<path d="M124 4h2v1h1v1h1v1h1v1h-8v-1h1v-1h1v-1h1zM7 5h2v8h-2zM14 5h1v8h-1v-1h-1v-1h-1v-1h-1v-2h1v-1h1v-1h1zM30 5h1v1h2v1h2v1h2v2h-2v1h-2v1h-2v1h-1zM98 5h1v1h1v1h1v1h1v2h-1v1h-1v1h-1v1h-1zM104 5h2v8h-2zM121 10h8v2h-8z" class="tone-898" fill="#e0e7ea"/>
+<g><rect x="7" y="5" width="2" height="8" class="tone-898" fill="#e0e7ea"/><polygon points="15,5 15,13 10,9" class="tone-898" fill="#e0e7ea"/></g>
+<g transform="translate(0 18)"><rect x="7" y="5" width="2" height="8" fill="#000000"/><polygon points="15,5 15,13 10,9" fill="#000000"/></g>
+<g><polygon points="30,5 30,13 38,9" class="tone-898" fill="#e0e7ea"/></g>
+<g transform="translate(0 18)"><polygon points="30,5 30,13 38,9" fill="#000000"/></g>
+<g><polygon points="98,5 98,13 103,9" class="tone-898" fill="#e0e7ea"/><rect x="104" y="5" width="2" height="8" class="tone-898" fill="#e0e7ea"/></g>
+<g transform="translate(0 18)"><polygon points="98,5 98,13 103,9" fill="#000000"/><rect x="104" y="5" width="2" height="8" fill="#000000"/></g>
+<g><polygon points="121,8 129,8 125,4" class="tone-898" fill="#e0e7ea"/><rect x="121" y="10" width="8" height="2" class="tone-898" fill="#e0e7ea"/></g>
+<g transform="translate(0 16)"><polygon points="121,8 129,8 125,4" fill="#000000"/><rect x="121" y="10" width="8" height="2" fill="#000000"/></g>
 </svg>

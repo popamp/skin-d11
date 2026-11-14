@@ -23,11 +23,13 @@ in the main menu's "Toolbar mode". This needs Popamp 1.0.0 or newer.
 
 ## Colours
 
-The skin comes in three colours: Graphite (the theme as it is), Ocean and
-Cocoa. Pick one in the main menu's "Colours". This needs Popamp 1.0.0 or
-newer. A set gives the theme's greys another hue and keeps the orange
-lamps: blue is the orange's opposite on the colour wheel, brown is its
-neighbour.
+The skin comes in four colours: Graphite (the theme as it is), Ocean,
+Cocoa and Light. Pick one in the main menu's "Colours". This needs Popamp
+1.0.0 or newer. Ocean and Cocoa give the theme's greys another hue and keep
+the orange lamps: blue is the orange's opposite on the colour wheel, brown
+is its neighbour. Light turns the greys' lightness round, so the body is
+the grey of Windows 11's light taskbar and the bar at the screen's bottom
+edge reads as its continuation.
 
 ## Install
 

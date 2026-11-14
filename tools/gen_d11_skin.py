@@ -77,6 +77,10 @@ BODY, DISPLAY, LINE, COLON = "#50575a", "#20272a", "#000000", "#e0e7ea"
 BAR_H = 20
 # The bar's fixed ends, and the narrowest bar
 BAR_LEFT, BAR_RIGHT, BAR_MIN = 316, 222, 640
+# Every part of the bar is as far from its top as from its bottom, so its
+# height is even like the bar's; the main menu and close buttons are drawn
+# for the bar at this size (see bar_buttons)
+BAR_BUTTON = 10
 
 BAR_WINDOW = """\
 
@@ -97,7 +101,19 @@ size = [%d, %d]
 # wheel, brown is its neighbour.
 FIRST_SET = "Graphite"
 OTHER_SETS = (("Ocean", 208, 0.3), ("Cocoa", 24, 0.2))
-# The greys are the colours about this hue and no more saturated than this
+# A light set that turns the greys' lightness round, so the theme reads as a
+# continuation of Windows 11's light taskbar: the body becomes the taskbar's
+# #dddedf, the black gaps and wells lighter than it, as Windows draws its
+# controls, and the light glyphs dark. Turning all of them round keeps every
+# pair the theme drew apart: a black glyph on a light pressed button is a
+# light glyph on a dark one. The lamps stay orange.
+LIGHT_SET, LIGHT_HUE, LIGHT_SATURATION = "Light", 210, 0.03
+# (lightness in the theme, lightness in the set), from black to the lightest
+# grey; between two steps the lightness goes in a straight line. The steps
+# beyond the body fall fast, so text on the light wells stays readable.
+LIGHT_STEPS = ((0, 0.985), (0.145, 0.945), (0.333, 0.871), (0.4, 0.58), (0.459, 0.42), (0.6, 0.32), (0.724, 0.24), (0.898, 0.12))
+# The greys are the colours about this hue and no more saturated than this,
+# and black, which the theme draws its gaps and dark glyphs in
 GREY_HUE, GREY_SATURATION = (185, 210), 0.2
 # The greys met so far, as name by colour
 GREYS = {}
@@ -114,7 +130,7 @@ def hls(colour):
 def grey_name(colour):
     """The name a grey of the theme has in the colour sets, None for any other colour."""
     h, l, s = hls(colour)
-    if not (GREY_HUE[0] <= h * 360 <= GREY_HUE[1] and s <= GREY_SATURATION):
+    if l > 0 and not (GREY_HUE[0] <= h * 360 <= GREY_HUE[1] and s <= GREY_SATURATION):
         return None
     name = GREYS.setdefault(colour, f"tone-{round(l * 1000)}")
     assert sum(n == name for n in GREYS.values()) == 1, f"two greys are both {name}"
@@ -143,7 +159,19 @@ def colour_sets():
             _, l, s = hls(colour)
             rgb = colorsys.hls_to_rgb(hue / 360, l, min(1, s + saturation))
             lines.append(f'{name} = "{hexc(round(v * 255) for v in rgb)}"')
+    lines += ["", f"[colors.{LIGHT_SET}]"]
+    for colour, name in greys:
+        rgb = colorsys.hls_to_rgb(LIGHT_HUE / 360, light_lightness(hls(colour)[1]), LIGHT_SATURATION)
+        lines.append(f'{name} = "{hexc(round(v * 255) for v in rgb)}"')
     return lines + [""]
+
+
+def light_lightness(l):
+    """A grey's lightness in the light set, from its lightness in the theme."""
+    for (l0, m0), (l1, m1) in zip(LIGHT_STEPS, LIGHT_STEPS[1:]):
+        if l <= l1:
+            return m0 + (m1 - m0) * (max(l, l0) - l0) / (l1 - l0)
+    return LIGHT_STEPS[-1][1]
 
 
 def read_reference(path):
@@ -350,12 +378,37 @@ def bar_pictures():
     return {
         # frames of the transport buttons and of Open, then the display up to the title, with the clock's colon
         "left": rects(BAR_LEFT, BAR_H, *body(BAR_LEFT), (15, 0, 116, 20, LINE), (133, 1, 24, 18, LINE),
-                      (160, 1, 156, 18, LINE), (161, 2, 155, 16, DISPLAY), (211, 9, 2, 2, COLON), (211, 13, 2, 2, COLON)),  # fmt: skip
+                      (160, 1, 156, 18, LINE), (161, 2, 155, 16, DISPLAY), (211, 8, 2, 2, COLON), (211, 12, 2, 2, COLON)),  # fmt: skip
         # the display under the title, with the groove of the position slider
         "mid": rects(8, BAR_H, (0, 0, 8, BAR_H, LINE), (0, 2, 8, 16, DISPLAY), (0, 13, 8, 2, LINE)),
-        # the display's end, then frames of the EQ and PL lamps and of Shuffle and Repeat
-        "right": rects(BAR_RIGHT, BAR_H, *body(BAR_RIGHT), (0, 1, 1, 18, LINE), (80, 3, 48, 14, LINE), (131, 2, 76, 17, LINE)),
+        # the display's end, then frames of the EQ and PL lamps and of Shuffle and Repeat; PL's
+        # own right column is dark, so its frame is a pixel narrower to look even
+        "right": rects(BAR_RIGHT, BAR_H, *body(BAR_RIGHT), (0, 1, 1, 18, LINE), (80, 3, 47, 14, LINE), (131, 2, 76, 16, LINE)),
+        "buttons": bar_buttons(),
     }
+
+
+def bar_buttons():
+    """Main Menu and Close for the bar, side by side, the pressed ones under them.
+
+    The title bar's buttons are 9 pixels, an odd size that cannot sit in the
+    middle of the 20-pixel bar; these are the same buttons a pixel larger.
+    """
+    glyph = {box[0]: icon for sheet, box, _, icon in ICONS if sheet == "titlebar"}
+    size, ring_corner = BAR_BUTTON, "#383e40"
+    shapes, glyphs = [], []
+    for y, face, corner, ink in ((0, "#70777a", BODY, COLON), (size, "#e05010", "#a43809", LINE)):
+        # the menu icon's box starts at 2 on its sheet, the close icon's at 20 (the button at 18)
+        for x, icon, origin in ((0, glyph[2], 0), (size, glyph[20], 18)):
+            far = size - 1
+            shapes += [(x, y, size, size, LINE), (x + 1, y + 1, size - 2, size - 2, face)]
+            shapes += [(x + dx, y + dy, 1, 1, ring_corner) for dx in (0, far) for dy in (0, far)]
+            shapes += [(x + dx, y + dy, 1, 1, corner) for dx in (1, far - 1) for dy in (1, far - 1)]
+            # half a pixel on, to the middle of a face a pixel larger
+            moved = f'translate({x - origin + 0.5} {y + 0.5})'
+            glyphs.append(f'<g transform="{moved}">' + "".join(icon_shape(s, ink) for s in icon) + "</g>")
+    picture = rects(2 * size, 2 * size, *shapes)
+    return picture.replace("\n</svg>", "\n" + "\n".join(glyphs) + "\n</svg>")
 
 
 def element(kind, place, **keys):
@@ -379,6 +432,10 @@ def area(sheet, x, y, w, h):
     return {"file": f"sheets/{sheet}.svg", "area": [x, y, w, h]}
 
 
+def bar_area(x, y):
+    return {"file": "bar/buttons.svg", "area": [x, y, BAR_BUTTON, BAR_BUTTON]}
+
+
 def end(x):
     """A place counted from the bar's right end, where the right picture starts at 0."""
     return f"end-{BAR_RIGHT - x}"
@@ -390,7 +447,8 @@ def bar_window():
     e += element("image", (0, 0, BAR_LEFT, BAR_H), normal="bar/left.svg")
     e += element("image", (BAR_LEFT, 0, end(0), BAR_H), normal="bar/mid.svg", fill="tile")
     e += element("image", (end(0), 0, "end", BAR_H), normal="bar/right.svg")
-    e += element("button", (4, 5, 9, 9), normal=area("titlebar", 0, 0, 9, 9), pressed=area("titlebar", 0, 9, 9, 9),
+    b = BAR_BUTTON
+    e += element("button", (3, 5, b, b), normal=bar_area(0, 0), pressed=bar_area(0, b),
                  menu_press="main", cursor="mainmenu", tip="Main Menu")  # fmt: skip
     transport = (
         (16, 0, 23, "previous", "Previous", {"shift": "back5s", "ctrl": "start-of-list", "menu": "previous"}),
@@ -404,10 +462,11 @@ def bar_window():
                      click=click, **more, tip=tip)  # fmt: skip
     e += element("button", (134, 2, 22, 16), normal=area("cbuttons", 114, 0, 22, 16), pressed=area("cbuttons", 114, 16, 22, 16),
                  click="open-file", shift="open-folder", ctrl="open-url", menu="eject", tip="Open")  # fmt: skip
+    # the digits in the middle of the display; the lamp half a pixel lower, as in the main window
     for sx, state in ((0, "playing"), (9, "paused"), (18, "stopped")):
-        e += element("image", (164, 6, 9, 9), normal=area("playpaus", sx, 0, 9, 9), show=state)
-    e += element("clock", (174, 4, 63, 13), hide="stopped")
-    e += element("button", (174, 4, 63, 13), press="toggle-time-mode", menu="time")
+        e += element("image", (164, 5, 9, 9), normal=area("playpaus", sx, 0, 9, 9), show=state)
+    e += element("clock", (174, 3, 63, 13), hide="stopped")
+    e += element("button", (174, 3, 63, 13), press="toggle-time-mode", menu="time")
     e += element("vis", (239, 2, 76, 16))
     e += element("button", (239, 2, 76, 16), press="cycle-vis-mode", menu="vis")
     e += element("marquee", (BAR_LEFT + 3, 3, end(-3), 9), double="file-info", cursor="songname",
@@ -425,13 +484,14 @@ def bar_window():
     toggles = (
         ("shufrep", 81, 4, 23, 12, (0, 61), (46, 61), (0, 73), (46, 73), "eq-window", "toggle-eq-window", {}),
         ("shufrep", 104, 4, 23, 12, (23, 61), (69, 61), (23, 73), (69, 73), "playlist-window", "toggle-playlist-window", {}),
-        ("shufrep", 132, 3, 47, 15, (28, 0), (28, 15), (28, 30), (28, 45), "shuffle", "toggle-shuffle", {"menu": "shuffle"}),
-        ("shufrep", 178, 3, 28, 15, (0, 0), (0, 15), (0, 30), (0, 45), "repeat", "toggle-repeat", {"menu": "repeat"}),
+        # without their empty top row: 14 pixels, the same above and below them
+        ("shufrep", 132, 3, 47, 14, (28, 1), (28, 16), (28, 31), (28, 46), "shuffle", "toggle-shuffle", {"menu": "shuffle"}),
+        ("shufrep", 178, 3, 28, 14, (0, 1), (0, 16), (0, 31), (0, 46), "repeat", "toggle-repeat", {"menu": "repeat"}),
     )
     for sheet, x, y, w, h, off, off_down, on, on_down, flag, click, more in toggles:
         e += element("toggle", (end(x), y, end(x + w), y + h), normal=area(sheet, *off, w, h), pressed=area(sheet, *off_down, w, h),
                      on=area(sheet, *on, w, h), on_pressed=area(sheet, *on_down, w, h), flag=flag, click=click, **more)  # fmt: skip
-    e += element("button", (end(210), 5, end(219), 14), normal=area("titlebar", 18, 0, 9, 9), pressed=area("titlebar", 18, 9, 9, 9),
+    e += element("button", (end(209), 5, end(209 + b), 5 + b), normal=bar_area(b, 0), pressed=bar_area(b, b),
                  click="exit", tip="Close")  # fmt: skip
     return [BAR_WINDOW.rstrip("\n"), *e]
 

@@ -7,6 +7,7 @@ author = "Christian Ruesch (vector port by Popamp)"
 format_version = 1
 
 [colors.Graphite]
+tone-0 = "#000000"
 tone-94 = "#141a1c"
 tone-145 = "#20272a"
 tone-235 = "#383e40"
@@ -40,6 +41,7 @@ tone-816 = "#cbd2d5"
 tone-898 = "#e0e7ea"
 
 [colors.Ocean]
+tone-0 = "#000000"
 tone-94 = "#0d1923"
 tone-145 = "#152635"
 tone-235 = "#263d52"
@@ -73,6 +75,7 @@ tone-816 = "#bdd1e3"
 tone-898 = "#d8e6f2"
 
 [colors.Cocoa]
+tone-0 = "#000000"
 tone-94 = "#21160f"
 tone-145 = "#312319"
 tone-235 = "#4c392c"
@@ -104,6 +107,40 @@ tone-692 = "#c5ac9c"
 tone-724 = "#cbb5a6"
 tone-816 = "#decdc2"
 tone-898 = "#efe3db"
+
+[colors.Light]
+tone-0 = "#fbfbfb"
+tone-94 = "#f4f5f5"
+tone-145 = "#f1f1f1"
+tone-235 = "#e7e8e9"
+tone-247 = "#e6e7e7"
+tone-259 = "#e5e6e6"
+tone-302 = "#e0e1e2"
+tone-318 = "#dfe0e1"
+tone-333 = "#dddedf"
+tone-357 = "#c2c4c5"
+tone-365 = "#b9bbbd"
+tone-373 = "#b0b2b5"
+tone-380 = "#a7aaac"
+tone-388 = "#9ea1a4"
+tone-396 = "#95989b"
+tone-404 = "#8e9194"
+tone-412 = "#888c8f"
+tone-420 = "#83868a"
+tone-427 = "#7d8185"
+tone-435 = "#787b7f"
+tone-443 = "#73767a"
+tone-451 = "#6d7174"
+tone-459 = "#686b6e"
+tone-573 = "#545759"
+tone-584 = "#525457"
+tone-610 = "#4e5052"
+tone-653 = "#47494b"
+tone-667 = "#454749"
+tone-692 = "#404244"
+tone-724 = "#3b3d3f"
+tone-816 = "#2c2d2e"
+tone-898 = "#1e1f20"
 
 [sheets]
 main = "sheets/main.svg"
@@ -161,9 +198,9 @@ normal = "bar/right.svg"
 
 [[window.bar.element]]
 type = "button"
-rect = [4, 5, 9, 9]
-normal = { file = "sheets/titlebar.svg", area = [0, 0, 9, 9] }
-pressed = { file = "sheets/titlebar.svg", area = [0, 9, 9, 9] }
+rect = [3, 5, 10, 10]
+normal = { file = "bar/buttons.svg", area = [0, 0, 10, 10] }
+pressed = { file = "bar/buttons.svg", area = [0, 10, 10, 10] }
 menu_press = "main"
 cursor = "mainmenu"
 tip = "Main Menu"
@@ -234,30 +271,30 @@ tip = "Open"
 
 [[window.bar.element]]
 type = "image"
-rect = [164, 6, 9, 9]
+rect = [164, 5, 9, 9]
 normal = { file = "sheets/playpaus.svg", area = [0, 0, 9, 9] }
 show = "playing"
 
 [[window.bar.element]]
 type = "image"
-rect = [164, 6, 9, 9]
+rect = [164, 5, 9, 9]
 normal = { file = "sheets/playpaus.svg", area = [9, 0, 9, 9] }
 show = "paused"
 
 [[window.bar.element]]
 type = "image"
-rect = [164, 6, 9, 9]
+rect = [164, 5, 9, 9]
 normal = { file = "sheets/playpaus.svg", area = [18, 0, 9, 9] }
 show = "stopped"
 
 [[window.bar.element]]
 type = "clock"
-rect = [174, 4, 63, 13]
+rect = [174, 3, 63, 13]
 hide = "stopped"
 
 [[window.bar.element]]
 type = "button"
-rect = [174, 4, 63, 13]
+rect = [174, 3, 63, 13]
 press = "toggle-time-mode"
 menu = "time"
 
@@ -324,30 +361,30 @@ click = "toggle-playlist-window"
 
 [[window.bar.element]]
 type = "toggle"
-edges = ["end-90", 3, "end-43", 18]
-normal = { file = "sheets/shufrep.svg", area = [28, 0, 47, 15] }
-pressed = { file = "sheets/shufrep.svg", area = [28, 15, 47, 15] }
-on = { file = "sheets/shufrep.svg", area = [28, 30, 47, 15] }
-on_pressed = { file = "sheets/shufrep.svg", area = [28, 45, 47, 15] }
+edges = ["end-90", 3, "end-43", 17]
+normal = { file = "sheets/shufrep.svg", area = [28, 1, 47, 14] }
+pressed = { file = "sheets/shufrep.svg", area = [28, 16, 47, 14] }
+on = { file = "sheets/shufrep.svg", area = [28, 31, 47, 14] }
+on_pressed = { file = "sheets/shufrep.svg", area = [28, 46, 47, 14] }
 flag = "shuffle"
 click = "toggle-shuffle"
 menu = "shuffle"
 
 [[window.bar.element]]
 type = "toggle"
-edges = ["end-44", 3, "end-16", 18]
-normal = { file = "sheets/shufrep.svg", area = [0, 0, 28, 15] }
-pressed = { file = "sheets/shufrep.svg", area = [0, 15, 28, 15] }
-on = { file = "sheets/shufrep.svg", area = [0, 30, 28, 15] }
-on_pressed = { file = "sheets/shufrep.svg", area = [0, 45, 28, 15] }
+edges = ["end-44", 3, "end-16", 17]
+normal = { file = "sheets/shufrep.svg", area = [0, 1, 28, 14] }
+pressed = { file = "sheets/shufrep.svg", area = [0, 16, 28, 14] }
+on = { file = "sheets/shufrep.svg", area = [0, 31, 28, 14] }
+on_pressed = { file = "sheets/shufrep.svg", area = [0, 46, 28, 14] }
 flag = "repeat"
 click = "toggle-repeat"
 menu = "repeat"
 
 [[window.bar.element]]
 type = "button"
-edges = ["end-12", 5, "end-3", 14]
-normal = { file = "sheets/titlebar.svg", area = [18, 0, 9, 9] }
-pressed = { file = "sheets/titlebar.svg", area = [18, 9, 9, 9] }
+edges = ["end-13", 5, "end-3", 15]
+normal = { file = "bar/buttons.svg", area = [10, 0, 10, 10] }
+pressed = { file = "bar/buttons.svg", area = [10, 10, 10, 10] }
 click = "exit"
 tip = "Close"

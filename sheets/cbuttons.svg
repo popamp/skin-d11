@@ -5,23 +5,23 @@
 <rect x="23" y="18" width="22" height="18" fill="#e05010"/>
 <rect x="46" y="18" width="22" height="18" fill="#e05010"/>
 <rect x="69" y="18" width="22" height="18" fill="#e05010"/>
-<path d="M22 0h1v36h-1zM45 0h1v36h-1zM68 0h1v36h-1zM91 0h1v36h-1zM113 0h23v1h-22v14h22v2h-22v14h22v5h-23z" fill="#000000"/>
+<path d="M22 0h1v36h-1zM45 0h1v36h-1zM68 0h1v36h-1zM91 0h1v36h-1zM113 0h23v1h-22v14h22v2h-22v14h22v5h-23z" class="tone-0" fill="#000000"/>
 <path d="M0 0h1v1h-1zM112 0h1v1h-1zM114 1h1v1h-1zM135 1h1v1h-1zM114 14h1v1h-1zM135 14h1v1h-1zM0 17h1v1h-1z" class="tone-333" fill="#50575a"/>
 <path d="M1 0h21v18h-21v-1h-1v-16h1zM92 0h20v1h1v17h-21zM115 1h20v1h1v12h-1v1h-20v-1h-1v-12h1z" class="tone-459" fill="#70777a"/>
 <path d="M114 17h1v1h-1zM135 17h1v1h-1zM0 18h1v1h-1zM114 30h1v1h-1zM135 30h1v1h-1zM0 35h1v1h-1zM112 35h1v1h-1z" fill="#a43809"/>
 <path d="M115 17h20v1h1v12h-1v1h-20v-1h-1v-12h1zM1 18h21v18h-21v-1h-1v-16h1zM92 18h21v17h-1v1h-20z" fill="#e05010"/>
-<rect x="53" y="23" width="3" height="8" fill="#000000"/>
-<rect x="58" y="23" width="3" height="8" fill="#000000"/>
-<rect x="76" y="23" width="8" height="8" fill="#000000"/>
+<rect x="53" y="23" width="3" height="8" class="tone-0" fill="#000000"/>
+<rect x="58" y="23" width="3" height="8" class="tone-0" fill="#000000"/>
+<rect x="76" y="23" width="8" height="8" class="tone-0" fill="#000000"/>
 <rect x="53" y="5" width="3" height="8" class="tone-898" fill="#e0e7ea"/>
 <rect x="58" y="5" width="3" height="8" class="tone-898" fill="#e0e7ea"/>
 <rect x="76" y="5" width="8" height="8" class="tone-898" fill="#e0e7ea"/>
 <g><rect x="7" y="5" width="2" height="8" class="tone-898" fill="#e0e7ea"/><polygon points="15,5 15,13 10,9" class="tone-898" fill="#e0e7ea"/></g>
-<g transform="translate(0 18)"><rect x="7" y="5" width="2" height="8" fill="#000000"/><polygon points="15,5 15,13 10,9" fill="#000000"/></g>
+<g transform="translate(0 18)"><rect x="7" y="5" width="2" height="8" class="tone-0" fill="#000000"/><polygon points="15,5 15,13 10,9" class="tone-0" fill="#000000"/></g>
 <g><polygon points="30,5 30,13 38,9" class="tone-898" fill="#e0e7ea"/></g>
-<g transform="translate(0 18)"><polygon points="30,5 30,13 38,9" fill="#000000"/></g>
+<g transform="translate(0 18)"><polygon points="30,5 30,13 38,9" class="tone-0" fill="#000000"/></g>
 <g><polygon points="98,5 98,13 103,9" class="tone-898" fill="#e0e7ea"/><rect x="104" y="5" width="2" height="8" class="tone-898" fill="#e0e7ea"/></g>
-<g transform="translate(0 18)"><polygon points="98,5 98,13 103,9" fill="#000000"/><rect x="104" y="5" width="2" height="8" fill="#000000"/></g>
+<g transform="translate(0 18)"><polygon points="98,5 98,13 103,9" class="tone-0" fill="#000000"/><rect x="104" y="5" width="2" height="8" class="tone-0" fill="#000000"/></g>
 <g><polygon points="121,8 129,8 125,4" class="tone-898" fill="#e0e7ea"/><rect x="121" y="10" width="8" height="2" class="tone-898" fill="#e0e7ea"/></g>
-<g transform="translate(0 16)"><polygon points="121,8 129,8 125,4" fill="#000000"/><rect x="121" y="10" width="8" height="2" fill="#000000"/></g>
+<g transform="translate(0 16)"><polygon points="121,8 129,8 125,4" class="tone-0" fill="#000000"/><rect x="121" y="10" width="8" height="2" class="tone-0" fill="#000000"/></g>
 </svg>

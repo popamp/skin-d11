@@ -544,7 +544,9 @@ STRIP_TOP, STRIP_H = TITLE_ROWS, 50
 LIST_TOP = STRIP_TOP + STRIP_H
 WELL_TOP, WELL_H = 3, 42  # the display's well in the strip, its frame included
 STRIP_LEFT, STRIP_RIGHT, TILE = 220, 20, 8
-WELL_X, WELL_END = 12, 9  # the well from the window's left, and its right frame this far from the window's end
+# The well from the window's left, and its right end this far from the window's end: the list block's outer
+# columns, so the display and the list stand in frames of one width
+WELL_X, WELL_END = 11, 7
 SEEK_H, BOTTOM_H = 16, 36  # the band, and the playlist's bottom pieces without their top two rows (the list's end)
 GROOVE_TOP = 5  # the position groove in the band
 CLOCK = (30, STRIP_TOP + WELL_TOP + 5)  # in the window; the colon 37 to its right
@@ -582,7 +584,7 @@ def library_pictures(pledit):
         "strip-left": rects(STRIP_LEFT, STRIP_H, *left),
         "strip-mid": rects(TILE, STRIP_H, *body(TILE, STRIP_H), *well(0, TILE)),
         "strip-right": rects(STRIP_RIGHT, STRIP_H, *right),
-        "seek-left": rects(STRIP_LEFT, SEEK_H, *band(STRIP_LEFT, WELL_X - 1, STRIP_LEFT, left=True)),
+        "seek-left": rects(STRIP_LEFT, SEEK_H, *band(STRIP_LEFT, WELL_X, STRIP_LEFT, left=True)),
         "seek-mid": rects(TILE, SEEK_H, *band(TILE, 0, TILE)),
         "seek-right": rects(STRIP_RIGHT, SEEK_H, *band(STRIP_RIGHT, 0, r, right=True)),
         "transport": rects(tw, th, *frame(0, 0, 116, 20, BODY), *frame(118, 1, 24, 18, BODY)),
@@ -685,7 +687,7 @@ def library_bottom(v):
     track picked in the library), the volume and the menu button."""
     y0 = BOTTOM_H + SEEK_H - GROOVE_TOP
     thumb = {"normal": area("posbar", 248, 0, 29, 10), "pressed": area("posbar", 278, 0, 29, 10)}
-    right = WELL_END + 2
+    right = WELL_END - 1  # the groove's right end has a column of the band past it
     seek = (WELL_X, f"end-{y0}", f"end-{right}", f"end-{y0 - 10}")
     # the main window's groove: its ends, and its middle tiled
     e = element("image", (WELL_X, f"end-{y0}", WELL_X + 6, f"end-{y0 - 10}"), v, normal=area("posbar", 0, 0, 6, 10))
